@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ -z ${1} ]; then
+	exit 1
+fi
+
+source rbackup.conf
+
+if [ ! -z ${REMOTE} ]; then
+	RSYNC_REMOTE="${REMOTE}:"
+fi
+
+OPT="-aPh"
+
+rsync --link-dest=${LAST} ${OPT} ${SRC} ${RSYNC_REMOTE}${DEST}${NAME}
+
+if [ -z $REMOTE ]; then
+	rm ${LAST}; ln -sf ${DEST}${NAME} ${LAST}
+else
+	ssh $REMOTE "rm ${LAST}; ln -sf ${DEST}${NAME} ${LAST}"
+fi

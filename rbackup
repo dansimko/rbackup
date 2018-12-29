@@ -1,10 +1,16 @@
 #!/bin/bash
 
-if [ -z ${1} ]; then
-	exit 1
+CONFIG="${1}"
+
+if [ -z ${CONFIG} ]; then
+	if [ -e $HOME/.config/rbackup/config ]; then
+		CONFIG="$HOME/.config/rbackup/config"
+	else
+		exit 1
+	fi
 fi
 
-source rbackup.conf
+source ${CONFIG}
 
 if [ ! -z ${REMOTE} ]; then
 	RSYNC_REMOTE="${REMOTE}:"

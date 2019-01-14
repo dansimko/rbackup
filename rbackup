@@ -2,10 +2,11 @@
 
 CONFIG="${1}"
 
-if [ -z ${CONFIG} ]; then
-	if [ -e $HOME/.config/rbackup/config ]; then
+if [ -z ${CONFIG} ] || [ ! -f ${CONFIG} ]; then
+	if [ -f $HOME/.config/rbackup/config ]; then
 		CONFIG="$HOME/.config/rbackup/config"
 	else
+		printf "Error: config not found."
 		exit 1
 	fi
 fi
@@ -16,9 +17,13 @@ if [ ! -z ${REMOTE} ]; then
 	RSYNC_REMOTE="${REMOTE}:"
 fi
 
+for i in ${!SRC[@]}; do
+	SRC[i]="$(realpath ${SRC[i]})"
+done
+
 OPT="-aPh"
 
-rsync --link-dest=${LAST} ${OPT} ${SRC} ${RSYNC_REMOTE}${DEST}${NAME}
+rsync --link-dest=${LAST} ${OPT} ${SRC[*]} ${RSYNC_REMOTE}${DEST}${NAME}
 
 if [ -z $REMOTE ]; then
 	rm ${LAST}; ln -sf ${DEST}${NAME} ${LAST}
